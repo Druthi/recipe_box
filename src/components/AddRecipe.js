@@ -1,7 +1,18 @@
 import React, { Component } from 'react';
-import { Input, Button, Message } from 'semantic-ui-react';
+import { Input, Button, Message, Segment } from 'semantic-ui-react';
 import uuidv4 from 'uuid/v4';
 
+//import IngridientsList from './IngridientsList';
+
+const Ingridient = ({id, name, ingridients}) => {
+  return (
+    <Segment> 
+      
+        {ingridients}
+      
+    </Segment>
+  );
+};
 
 class AddRecipe extends Component {
 
@@ -10,8 +21,8 @@ class AddRecipe extends Component {
     this.state = {
       recipes: {},
       inputValue: {
-          name:"",
-          ingridients:""
+        name:"",
+        ingridients:""
       }
     }
   }
@@ -43,7 +54,7 @@ class AddRecipe extends Component {
         recipes: {
             ...recipes,
             [recipeId]: { 
-                recipeId: recipeId,
+                id: recipeId,
                 name:inputValue.name,
                 ingridients:inputValue.ingridients
             }            
@@ -53,7 +64,7 @@ class AddRecipe extends Component {
             ingridients:""
         }
     });
-    console.log(recipes);
+    console.log(Object.entries(this.state.recipes));
   }
 
   onClick= () => {
@@ -73,6 +84,16 @@ class AddRecipe extends Component {
             <Button primary>Add Recipe</Button>
         </form>
         <Button basic onClick={this.props.closeModal}>Close</Button>
+        <Segment.Group>
+                    {Object.entries(recipes).map(
+                      ([id, { Id, name, ingridients }]) => (
+                        <Ingridient
+                          key={id}
+                          name={name}
+                          ingridients={ingridients}                          
+                        />
+                    ))}
+        </Segment.Group>
                
         
       </div>
