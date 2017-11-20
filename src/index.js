@@ -6,5 +6,5 @@ import AddRecipe from './components/AddRecipe';
 import 'semantic-ui-css/semantic.min.css';
 import registerServiceWorker from './registerServiceWorker';
 
-ReactDOM.render(<AddRecipe/>, document.getElementById('root'));
+ReactDOM.render(<App/>, document.getElementById('root'));
 registerServiceWorker();

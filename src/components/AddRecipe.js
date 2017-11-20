@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Input, Button } from 'semantic-ui-react';
+import { Input, Button, Message } from 'semantic-ui-react';
 import uuidv4 from 'uuid/v4';
+
 
 class AddRecipe extends Component {
 
@@ -55,6 +56,10 @@ class AddRecipe extends Component {
     console.log(recipes);
   }
 
+  onClick= () => {
+    this.dialog.showAlert('Hello Dialog!')
+  }
+
   render() {
       const { inputValue, recipes } = this.state;
     return (
@@ -67,8 +72,8 @@ class AddRecipe extends Component {
        
             <Button primary>Add Recipe</Button>
         </form>
-        <Button basic>Close</Button>
-        
+        <Button basic onClick={this.props.closeModal}>Close</Button>
+               
         
       </div>
     );
