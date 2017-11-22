@@ -1,18 +1,24 @@
 import React, { Component } from 'react';
 import Modal from 'react-modal';
 //import AddRecipe from './components/AddRecipe';
-import { Input, Button, Message, Segment } from 'semantic-ui-react';
+import { Input, Button, Message, Segment, Accordion, Icon } from 'semantic-ui-react';
 import uuidv4 from 'uuid/v4';
 
-const Ingridient= ({id, name, ingridients}) => {
-  return(
-    <Segment>
-      <label>
-      {name}
-      </label>
-    </Segment>
-  );
-};
+//const Ingridient= ({id, name, ingridients}) => {
+//  const ingridientList= ingridients.split(",");
+//  return(
+//    <Accordion.Title active={activeIndex === 0} index={0} onClick={this.handleClick}>
+//          <Icon name='dropdown' />
+//          What is a dog?
+//    </Accordion.Title>
+//    <Accordion.Content active={activeIndex === 0}>
+//          <p>
+//            A dog is a type of domesticated animal. Known for its loyalty and faithfulness, it can be found as a
+//            {' '}welcome guest in many households across the world.
+//          </p>
+//    </Accordion.Content>
+//  );
+//};
 
 class App extends Component {
   constructor(props){
@@ -23,8 +29,10 @@ class App extends Component {
       inputValue: {
           name:"",
           ingridients:""
-      }
+      },
+      activeIndex: 0
     }
+
   }
 
   onRecipeChange= (e) => {
@@ -86,6 +94,35 @@ class App extends Component {
     });
   }
 
+  handleClick = (e, titleProps) => {
+    const { index } = titleProps
+    const { activeIndex } = this.state
+    const newIndex = activeIndex === index ? -1 : index
+
+    this.setState({ activeIndex: newIndex })
+  }
+
+  displayContent= () => {
+    const { activeIndex, recipes } = this.state;
+    Object.entries(recipes).map(([id, { name, ingridients }], index) => {
+      const ingridientList= ingridients.split(",");  
+      return (          
+        <Accordion>
+          <Accordion.Title active={activeIndex === index} index={index} onClick={this.handleClick}>
+                <Icon name='dropdown' />
+                {name}
+          </Accordion.Title>
+          <Accordion.Content active={activeIndex === index}>
+                {ingridientList.map((ingrid) => {
+                <p>
+                  {ingrid}
+                </p>
+                })}
+          </Accordion.Content>
+        </Accordion>
+    )});
+  }
+
  
   render() {
     const { inputValue, recipes } = this.state;
@@ -106,15 +143,9 @@ class App extends Component {
           </Modal>     
           
         </section>
-        <Segment.Group>
-        {Object.entries(recipes).map(([id, { name, ingridients }]) => (
-          <Ingridient
-            key={id}
-            name={name}
-            ingridients={ingridients}            
-          />
-        ))}
-        </Segment.Group>
+        <div>
+        {this.displayContent} 
+        </div>
       </div>
     );
   }
