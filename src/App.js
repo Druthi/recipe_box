@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import Modal from 'react-modal';
 //import AddRecipe from './components/AddRecipe';
-import { Input, Button, Message, Segment, Accordion, Icon } from 'semantic-ui-react';
+import IngridientsList from './components/IngridientsList';
+import { Input, Button, Message, Segment, Accordion } from 'semantic-ui-react';
 import uuidv4 from 'uuid/v4';
 
 //const Ingridient= ({id, name, ingridients}) => {
@@ -29,8 +30,7 @@ class App extends Component {
       inputValue: {
           name:"",
           ingridients:""
-      },
-      activeIndex: 0
+      }
     }
 
   }
@@ -94,35 +94,6 @@ class App extends Component {
     });
   }
 
-  handleClick = (e, titleProps) => {
-    const { index } = titleProps
-    const { activeIndex } = this.state
-    const newIndex = activeIndex === index ? -1 : index
-
-    this.setState({ activeIndex: newIndex })
-  }
-
-  displayContent= () => {
-    const { activeIndex, recipes } = this.state;
-    Object.entries(recipes).map(([id, { name, ingridients }], index) => {
-      const ingridientList= ingridients.split(",");  
-      return (          
-        <Accordion>
-          <Accordion.Title active={activeIndex === index} index={index} onClick={this.handleClick}>
-                <Icon name='dropdown' />
-                {name}
-          </Accordion.Title>
-          <Accordion.Content active={activeIndex === index}>
-                {ingridientList.map((ingrid) => {
-                <p>
-                  {ingrid}
-                </p>
-                })}
-          </Accordion.Content>
-        </Accordion>
-    )});
-  }
-
  
   render() {
     const { inputValue, recipes } = this.state;
@@ -144,7 +115,14 @@ class App extends Component {
           
         </section>
         <div>
-        {this.displayContent} 
+        {Object.entries(recipes).map(([id, { name, ingridients }], index) => (
+          <IngridientsList
+            key={id}
+            name={name}
+            ingridients={ingridients}  
+            index={index}          
+          />
+        ))}
         </div>
       </div>
     );
