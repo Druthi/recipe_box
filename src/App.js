@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import Modal from 'react-modal';
 //import AddRecipe from './components/AddRecipe';
 import IngridientsList from './components/IngridientsList';
-import { Input, Button, Message, Segment, Accordion } from 'semantic-ui-react';
+import { Form, FormGroup, FormControl, Button, Message, Segment, Accordion, Modal } from 'react-bootstrap';
+//import { Input } from 'semantic-ui-react';
 import uuidv4 from 'uuid/v4';
 
 //const Ingridient= ({id, name, ingridients}) => {
@@ -25,7 +25,7 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-      isActive: false,
+      showModal: false,
       recipes: {},
       inputValue: {
           name:"",
@@ -54,7 +54,7 @@ class App extends Component {
   }
 
   createRecipe= (e) => {
-      //console.log(e)
+      console.log(e)
     e.preventDefault();
     const { inputValue, recipes } = this.state;
     const recipeId = uuidv4();
@@ -77,23 +77,31 @@ class App extends Component {
     //console.log(recipes);
   }
 
- 
-
-  onClick= () => {
-    this.dialog.showAlert('Hello Dialog!')
+  close = () => {
+    this.setState({ showModal: false });
   }
 
-  componentWillMount = () =>{
-    Modal.setAppElement('body');
+  open = () => {
+    this.setState({ showModal: true });
   }
 
-
-  toggleModal = () => {
-    this.setState({...this.state,
-      isActive: !this.state.isActive
-    });
-  }
-
+ //
+//
+  //onClick= () => {
+  //  this.dialog.showAlert('Hello Dialog!')
+  //}
+//
+  //componentWillMount = () =>{
+  //  Modal.setAppElement('body');
+  //}
+//
+//
+  //toggleModal = () => {
+  //  this.setState({...this.state,
+  //    isActive: !this.state.isActive
+  //  });
+  //}
+//
  
   render() {
     const { inputValue, recipes } = this.state;
@@ -101,18 +109,28 @@ class App extends Component {
       
       <div className="App">
         <section>
-          <Button onClick={this.toggleModal}> Show Modal </Button>
-          <Modal isOpen={this.state.isActive} onRequestClose={this.toggleModal}>
-          <form onSubmit={this.createRecipe}>
-          <p>Recipe</p>
-           <Input placeholder='Recipe Name' onChange={this.onRecipeChange} value={inputValue.name}/>
-          <p>Ingridients</p>
-          <Input placeholder='Enter ingridients separated by commas' onChange={this.onIngridientsChange} value={inputValue.ingridients} size="large"/>       
-            <Button primary>Add Recipe</Button>
-          </form>
-          <Button basic onClick={this.toggleModal}>Close</Button>
-          </Modal>     
-          
+          <Button bsStyle="primary" onClick={this.open}> Show Modal </Button>
+          <Modal show={this.state.showModal} onHide={this.close}>
+            <Modal.Header closeButton>
+              <Modal.Title>Add Recipe</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form>
+                <p>Recipe</p>
+                  <FormGroup>
+                    <FormControl type="text" placeholder='Recipe Name' onChange={this.onRecipeChange} value={inputValue.name}/>
+                  </FormGroup>
+                <p>Ingridients</p>
+                  <FormGroup>
+                    <FormControl type="text" placeholder='Enter ingridients separated by commas' onChange={this.onIngridientsChange} value={inputValue.ingridients} size="large"/>       
+                  </FormGroup>                  
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button onClick={this.createRecipe} bsStyle="primary">Add Recipe</Button>
+              <Button onClick={this.close}>Close</Button>
+            </Modal.Footer>
+          </Modal>          
         </section>
         <div>
         {Object.entries(recipes).map(([id, { name, ingridients }], index) => (
