@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 //import AddRecipe from './components/AddRecipe';
 import IngridientsList from './components/IngridientsList';
-import { Form, FormGroup, FormControl, Button, Message, Segment, Accordion, Modal } from 'react-bootstrap';
+import { Well, Form, FormGroup, FormControl, Button, Accordion, Modal } from 'react-bootstrap';
 //import { Input } from 'semantic-ui-react';
 import uuidv4 from 'uuid/v4';
+import { pickBy } from 'lodash';
 
 //const Ingridient= ({id, name, ingridients}) => {
 //  const ingridientList= ingridients.split(",");
@@ -53,6 +54,7 @@ class App extends Component {
     });
   }
 
+      
   createRecipe= (e) => {
       console.log(e)
     e.preventDefault();
@@ -75,6 +77,21 @@ class App extends Component {
     });
     console.log(Object.entries(recipes));
     //console.log(recipes);
+  }
+
+  deleteRecipe = (id) =>{
+    const { recipes } = this.state;
+    const newObj = pickBy(
+      recipes,
+      ({ recipeId }) => recipeId !== id
+    );
+    this.setState({ recipes: newObj});
+    //console.log(Object.entries(newObj));
+
+  }
+
+  editRecipe= (id) =>{
+
   }
 
   close = () => {
@@ -133,14 +150,19 @@ class App extends Component {
           </Modal>          
         </section>
         <div>
-        {Object.entries(recipes).map(([id, { name, ingridients }], index) => (
-          <IngridientsList
-            key={id}
-            name={name}
-            ingridients={ingridients}  
-            index={index}          
-          />
-        ))}
+          <Well>
+            {Object.entries(recipes).map(([id, { name, ingridients }], index) => (
+              <IngridientsList
+                key={id}
+                name={name}
+                ingridients={ingridients}  
+                index={index}   
+                delete={this.deleteRecipe}
+                edit={this.editRecipe} 
+                id={id}      
+              />
+            ))}
+          </Well>
         </div>
       </div>
     );
