@@ -107,7 +107,11 @@ class App extends Component {
           ingridients: inputValue.ingridients
         }
       },
-      editModal: false
+      editModal: false,
+      inputValue: {
+        name: "",
+        ingridients: ""
+      }
     });
     console.log(Object.entries(recipes));
 
