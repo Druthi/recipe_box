@@ -3,6 +3,9 @@ import IngridientsList from './components/IngridientsList';
 import { Well, Form, FormGroup, FormControl, Button, Accordion, Modal } from 'react-bootstrap';
 import uuidv4 from 'uuid/v4';
 import { pickBy } from 'lodash';
+import firebase from './firebase.js';
+
+
 
 class App extends Component {
   constructor(props) {
@@ -15,7 +18,7 @@ class App extends Component {
         name: "",
         ingridients: ""
       },
-      editId: 0
+      editId: 0,
     }
 
   }
@@ -47,6 +50,15 @@ class App extends Component {
     e.preventDefault();
     const { inputValue, recipes } = this.state;
     const recipeId = uuidv4();
+    const recipeRef = firebase.database().ref('recipes');
+    const recipe = {
+      recipeId: recipeId,
+      name: this.state.inputValue.name,
+      ingridients: this.state.inputValue.ingridients
+    }
+    console.log(recipe);
+    recipeRef.push(recipe);
+    
     this.setState({
       ...this.state,
       recipes: {
@@ -67,18 +79,44 @@ class App extends Component {
     //console.log(recipes);
   }
 
-  deleteRecipe = (id) => {
+  componentDidMount() {
+    const itemsRef = firebase.database().ref('recipes');
+    itemsRef.on('value', (snapshot) => {
+      let items = snapshot.val();
+      let newState = {};
+      for (let item in items) {
+        newState[items[item].recipeId] = {
+          recipeId: items[item].recipeId,
+          name: items[item].name,
+          ingridients: items[item].ingridients,
+          fireId: item
+        }
+      }
+      
+      
+      this.setState({ ... this.state,
+        recipes: newState
+      });
+      console.log(newState);
+    });
+    
+    
+  }
+
+  deleteRecipe = (id, fId) => {
     const { recipes } = this.state;
     const newObj = pickBy(
       recipes,
       ({ recipeId }) => recipeId !== id
     );
     this.setState({ recipes: newObj });
+    const itemRef = firebase.database().ref(`/recipes/${fId}`);
+    itemRef.remove();
     //console.log(Object.entries(newObj));
 
   }
 
-  editRecipe = (id) => {
+  editRecipe = (id, fId) => {
     const { recipes, inputValue } = this.state;
     const recipe = pickBy(
       recipes,
@@ -86,23 +124,24 @@ class App extends Component {
     );
 
     this.setState({
-      editModal: true, editId: id,
+      editModal: true, editId:{rId: id, fId:fId},
       inputValue: {
         name: recipe[id].name,
         ingridients: recipe[id].ingridients
       }
     });
-    console.log(this.state.editModal, inputValue);
+    //console.log(this.state.editModal, inputValue);
   }
 
-  finalEdit = (id) => {
-    const { inputValue, recipes } = this.state;
+  finalEdit = (rId, fId) => {
+    const { inputValue, recipes } = this.state;      
+    
     this.setState({
       ...this.state,
       recipes: {
         ...recipes,
-        [id]: {
-          recipeId: id,
+        [rId]: {
+          recipeId: rId,
           name: inputValue.name,
           ingridients: inputValue.ingridients
         }
@@ -114,8 +153,16 @@ class App extends Component {
       }
     });
     console.log(Object.entries(recipes));
-
-
+  //  let ref = firebaseDb.ref('recipes');
+  //  return ref
+  //    .child(fId)
+  //    .update(data)
+  //    .then(() => ref.once('value'))
+  //    .then(snapshot => snapshot.val())
+  //    .catch(error => ({
+  //      errorCode: error.code,
+  //      errorMessage: error.message
+  //    }));
   }
 
   close = () => {
@@ -126,10 +173,22 @@ class App extends Component {
     this.setState({ showModal: true, editModal: true });
   }
 
+  //handleSubmit = (e) => {
+  //  e.preventDefault();
+  //  const recipeRef = firebase.database().ref('recipes');
+  //  const recipe = {
+  //    name: this.state.inputValue.name,
+  //    ingridients: this.state.inputValue.ingridients
+  //  }
+  //  recipeRef.push(recipe);
+  //  
+  //}
+  
+
 
 
   render() {
-    const { inputValue, recipes } = this.state;
+    const { inputValue, recipes, editId } = this.state;
     return (
 
       <div className="App">
@@ -139,7 +198,7 @@ class App extends Component {
               <Modal.Title>Edit Recipe</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <Form>
+              <Form >
                 <p>Recipe</p>
                 <FormGroup >
                   <FormControl type="text" placeholder='Recipe Name' onChange={this.onRecipeChange} value={inputValue.name} />
@@ -151,7 +210,7 @@ class App extends Component {
               </Form>
             </Modal.Body>
             <Modal.Footer>
-              <Button onClick={() => this.finalEdit(this.state.editId)} bsStyle="primary">Edit Recipe</Button>
+              <Button onClick={() => this.finalEdit(editId.rId, editId.fId)} bsStyle="primary">Edit Recipe</Button>
               <Button onClick={this.close}>Close</Button>
             </Modal.Footer>
           </Modal>
@@ -180,7 +239,7 @@ class App extends Component {
         </section>
         <div>
           <Well>
-            {Object.entries(recipes).map(([id, { name, ingridients }], index) => (
+            {Object.entries(recipes).map(([id, { name, ingridients, fireId}], index) => (
               <IngridientsList
                 key={id}
                 name={name}
@@ -189,6 +248,7 @@ class App extends Component {
                 delete={this.deleteRecipe}
                 edit={this.editRecipe}
                 id={id}
+                fireId={fireId}
               />
             ))}
           </Well>

@@ -27,8 +27,8 @@ class IngridientsList extends Component {
                                 {ingridientList.map((list) => {
                                     return <ListGroupItem>{list}</ListGroupItem> })}
                             </ListGroup>
-                            <Button bsStyle="danger" onClick={() => this.props.delete(this.props.id)}>Delete</Button>
-                            <Button onClick={() => this.props.edit(this.props.id)} >Edit</Button>
+                            <Button bsStyle="danger" onClick={() => this.props.delete(this.props.id, this.props.fireId)}>Delete</Button>
+                            <Button onClick={() => this.props.edit(this.props.id, this.props.fireId)} >Edit</Button>
                         </Panel>                        
                     </Accordion>
             </div>
